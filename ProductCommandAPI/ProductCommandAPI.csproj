@@ -24,11 +24,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Azure\ServiceBus\" />
     <Folder Include="Services\Product\" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\AzureServiceBus\AzureServiceBus.csproj" />
     <ProjectReference Include="..\BuildingBlocks\BuildingBlocks.csproj" />
   </ItemGroup>
 

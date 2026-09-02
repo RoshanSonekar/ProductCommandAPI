@@ -2,5 +2,6 @@
   <Folder Name="/BuildingBlocks/">
     <Project Path="BuildingBlocks/BuildingBlocks.csproj" />
   </Folder>
+  <Project Path="AzureServiceBus/AzureServiceBus.csproj" />
   <Project Path="ProductCommandAPI/ProductCommandAPI.csproj" />
 </Solution>

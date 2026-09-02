@@ -1,7 +1,5 @@
 using BuildingBlocks.Exceptions.Handler;
-using FluentValidation;
 using HealthChecks.UI.Client;
-using Marten;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
