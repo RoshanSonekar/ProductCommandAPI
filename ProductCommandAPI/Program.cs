@@ -1,7 +1,9 @@
 using BuildingBlocks.Exceptions.Handler;
 using HealthChecks.UI.Client;
+using JasperFx.MultiTenancy;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.EntityFrameworkCore;
+using ProductCommandAPI.Infra;
 using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -9,7 +11,7 @@ var assembly = typeof(Program).Assembly;
 
 // Add services to the container.
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-
+string connectionString = builder.Configuration.GetConnectionString("SQLServer") ?? throw new InvalidOperationException("Connection string 'SqlServer' not found.");
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 
@@ -25,30 +27,43 @@ builder.Services.AddMediatR(config =>
 // Add FluentValidation services
 builder.Services.AddValidatorsFromAssembly(assembly);
 
-// Add Carter for minimal API
-builder.Services.AddCarter();
+//// Add Carter for minimal API
+//builder.Services.AddCarter();
 
-builder.Services.AddMarten(options =>
-{
-	options.Connection(builder.Configuration.GetConnectionString("PostgreSql")!); // Roshan#2026@ DB password
-}).UseLightweightSessions();
+//builder.Services.AddMarten(options =>
+//{
+//	options.Connection(builder.Configuration.GetConnectionString("PostgreSql")!); // Roshan#2026@ DB password
+//}).UseLightweightSessions();
 
-builder.Services.AddDbContext<ProductCommandAPIContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("SQLServer")));
+builder.Services.AddDbContext<ProductCommandAPIContext>
+	(
+	options => options.UseSqlServer(connectionString
+	));
 
 builder.Services.AddExceptionHandler<CustomExceptionHandler>();
 
+//builder.Services.AddHealthChecks()
+//	.AddNpgSql(builder.Configuration.GetConnectionString("PostgreSql")!);
+
+// Application Services
+builder.Services.AddScoped<ICategoryService, CategoryService>();
+builder.Services.AddScoped<IProductService, ProductService>();
+
 builder.Services.AddHealthChecks()
-	.AddNpgSql(builder.Configuration.GetConnectionString("PostgreSql")!);
+		.AddSqlServer(
+				connectionString: connectionString,
+				healthQuery: "SELECT 1;", // Default, but can be customized
+				name: "sql-server",
+				tags: new[] { "ready" }
+		);
 
 var app = builder.Build();
 
-app.MapCarter();
-app.UseExceptionHandler(options => { });
 app.UseHealthChecks("/health",
-	new HealthCheckOptions
+	new Microsoft.AspNetCore.Diagnostics.HealthChecks.HealthCheckOptions
 	{
 		ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
-	});
+	}); 
 
 app.MapOpenApi();
 app.MapScalarApiReference();

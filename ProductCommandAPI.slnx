@@ -2,6 +2,8 @@
   <Folder Name="/BuildingBlocks/">
     <Project Path="BuildingBlocks/BuildingBlocks.csproj" />
   </Folder>
+  <Project Path="../ProductManagement/ProductManagement/ProductManagement.csproj" Id="30064117-0d56-4648-b805-8ee4177273ac" />
+  <Project Path="../ProductQueryAPI/ProductQueryAPI/ProductQueryAPI.csproj" Id="d6f3202f-d002-4a97-8d67-f8fe2740c2c0" />
   <Project Path="AzureServiceBus/AzureServiceBus.csproj" />
-  <Project Path="ProductCommandAPI/ProductCommandAPI.csproj" />
+  <Project Path="ProductCommandAPI/CatalogService.csproj" />
 </Solution>

@@ -1,0 +1,75 @@
+﻿
+CREATE TABLE Categories (
+    CategoryID INT IDENTITY(1,1) PRIMARY KEY,
+    CategoryName VARCHAR(100) NOT NULL,
+    DisplayOrder INT NOT NULL DEFAULT 0, 
+    Description VARCHAR(500) NULL,  
+    IsActive BIT NOT NULL DEFAULT 1,
+    CreatedDate DATETIME2 NOT NULL DEFAULT GETDATE(),
+
+    -- Unique Constraint on CategoryName
+    CONSTRAINT UQ_Categories_CategoryName UNIQUE (CategoryName)
+);
+GO
+
+CREATE TABLE Subcategories (
+    SubcategoryID INT IDENTITY(1,1) PRIMARY KEY,
+    CategoryID INT NOT NULL, 
+    SubcategoryName VARCHAR(100) NOT NULL,
+    DisplayOrder INT NOT NULL DEFAULT 0, 
+    Description VARCHAR(500) NULL,
+    IsActive BIT NOT NULL DEFAULT 1,
+    
+    CONSTRAINT FK_Subcategories_Categories FOREIGN KEY (CategoryID) 
+        REFERENCES Categories(CategoryID) ON DELETE CASCADE,
+
+        -- Unique Constraint on CategoryName
+    CONSTRAINT UQ_SubCategories_SubCategoryName UNIQUE (SubcategoryName)
+);
+GO
+
+CREATE TABLE Products (
+    ProductID INT IDENTITY(1,1) PRIMARY KEY,
+    SubcategoryID INT NOT NULL, -- This will now target the specific leaf/subcategory
+    SKU VARCHAR(50) NOT NULL UNIQUE,
+    DisplayOrder INT NOT NULL DEFAULT 0, 
+    ProductName VARCHAR(200) NOT NULL,
+    Description VARCHAR(MAX) NULL,
+    Price DECIMAL(18, 2) NOT NULL CHECK (Price >= 0),
+    StockQuantity INT NOT NULL DEFAULT 0 CHECK (StockQuantity >= 0),
+    PrimaryImageURL VARCHAR(2048) NULL,  
+    PrimaryImage VARBINARY(MAX) NULL,  
+    PrimaryImageMimeType VARCHAR(50) NULL,      
+    IsActive BIT NOT NULL DEFAULT 1,
+    CreatedDate DATETIME2 NOT NULL DEFAULT GETDATE(),
+    UpdatedDate DATETIME2 NULL,
+    
+    CONSTRAINT FK_Products_SubCategories FOREIGN KEY (SubcategoryID) 
+        REFERENCES Subcategories(SubcategoryID), 
+);
+GO
+
+-- 4. Create Indexes for performance 
+CREATE NONCLUSTERED INDEX IX_Products_SubcategoryID ON Products(SubcategoryID);
+GO
+
+CREATE TABLE ProductImages (
+    ImageID INT IDENTITY(1,1) PRIMARY KEY,
+    ProductID INT NOT NULL,
+    ImageURL VARCHAR(2048) NOT NULL, -- Standard max URL length for web compatibility
+    PrimaryImageURL VARCHAR(2048) NULL,  
+    PrimaryImage VARBINARY(MAX) NULL,  
+    PrimaryImageMimeType VARCHAR(50) NULL,    
+    DisplayOrder INT NOT NULL DEFAULT 0, -- Controls the carousel order
+    CreatedDate DATETIME2 NOT NULL DEFAULT GETDATE(),
+
+    -- Foreign Key Constraint linking to Products
+    CONSTRAINT FK_ProductImages_Products FOREIGN KEY (ProductID) 
+        REFERENCES Products(ProductID)
+        ON DELETE CASCADE
+);
+GO
+
+-- 2. Create an index on the Foreign Key for faster image lookups
+CREATE NONCLUSTERED INDEX IX_ProductImages_ProductID ON ProductImages(ProductID);
+GO
