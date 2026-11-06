@@ -39,13 +39,13 @@ builder.Services.AddExceptionHandler<CustomExceptionHandler>();
 // Explicitly register the transaction handlers from the Application project (MongoDB)
 builder.Services.AddTransient<MediatR.IRequestHandler<CatalogQueryService.Application.CategoriesQuery, CatalogQueryService.Application.GetCategoriesResult>, CategoriesQueryHandler>();
 builder.Services.AddTransient<MediatR.IRequestHandler<CatalogQueryService.Application.CategoryByIdQuery, CatalogQueryService.Application.CategoryByIdQueryResult>, CategoryByIdQueryHandler>();
+builder.Services.AddTransient<MediatR.IRequestHandler<CatalogQueryService.Application.SubCategoriesQuery, CatalogQueryService.Application.GetSubCategoriesResult>, SubCategoriesQueryHandler>();
 builder.Services.AddTransient<MediatR.IRequestHandler<CatalogQueryService.Application.SubCategoryByIdQuery, CatalogQueryService.Application.SubCategoryByIdQueryResult>, SubCategoryByIdQueryHandler>();
-//builder.Services.AddTransient<MediatR.IRequestHandler<CategoryQuery, GetCategoriesResult>, CategoryQueryHandler>();
+builder.Services.AddTransient<MediatR.IRequestHandler<CatalogQueryService.Application.SubCategoriesByCategoryIdQuery, CatalogQueryService.Application.GetSubCategoriesByCategoryIdResult>, SubCategoriesByCateogoryIdQueryHandler>();
 
 // Application Services
 builder.Services.AddScoped<ICategoryQueryService, CategoryQueryService>();
 builder.Services.AddScoped<ISubCategoryQueryService, SubCategoryQueryService>();
-
 
 builder.Services.AddHealthChecks()
 		.AddSqlServer(

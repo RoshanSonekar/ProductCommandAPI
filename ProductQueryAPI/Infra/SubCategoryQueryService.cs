@@ -39,7 +39,7 @@ namespace CatalogQueryService.Infra
 					.OrderBy(sc => sc.SubcategoryID)
 					.Skip((actualPage - 1) * actualSize)
 					.Take(actualSize)
-					.ToListAsync(); // Guaranteed to return an empty list [] if no records found
+					.ToListAsync();  
 
 			return (pagedSubCategories, totalCount);
 		}
@@ -53,35 +53,62 @@ namespace CatalogQueryService.Infra
 						cat => cat.CategoryId,
 						(sub, cat) => new SubCategoryWithCategoryDto
 						{
-							SubcategoryID = sub.SubcategoryID,
 							CategoryId = sub.CategoryId,
+							CategoryName = cat.CategoryName,
+							SubcategoryID = sub.SubcategoryID,
 							SubcategoryName = sub.SubcategoryName,
 							DisplayOrder = sub.DisplayOrder,
 							Description = sub.Description,
-							CategoryName = cat.CategoryName,
-							IsActive = Convert.ToInt16( sub.IsActive)
+							IsActive = Convert.ToInt16(sub.IsActive)
 						})
 				.Where(sc => sc.SubcategoryID == subCategoryId)
 				.FirstOrDefaultAsync() ?? new SubCategoryWithCategoryDto();
 
-		//	var result = await dbContext.Subcategories
-		//.AsNoTracking()
-		//.Where(s => s.SubcategoryID == subcategoryId)
-		//.Join(dbContext.Categories,
-		//		sub => sub.CategoryId,
-		//		cat => cat.CategoryId,
-		//		(sub, cat) => new
-		//		{
-		//			Subcategory = sub,
-		//			Category = cat
-		//		})
-		//.FirstOrDefaultAsync();
-
 			return subCategory;
 		}
-		public async Task<(IEnumerable<SubCategoryWithCategoryDto>, int TotalCount)> GetSubCategoriesByCategoryIdAsync(int categoryId, int? PageNumber = 1, int? PageSize = 10)
+		public async Task<(ProductCategory productCategory, IEnumerable<ProductSubCategory>, int TotalCount)> GetSubCategoriesByCategoryIdAsync(int categoryId, int? PageNumber = 1, int? PageSize = 10)
 		{
-			throw new NotImplementedException();
+			// fetch the category details first
+			ProductCategory? category = await dbContext.Categories
+					.AsNoTracking()
+					.Where(c => c.CategoryId == categoryId)
+					.Select(c => new ProductCategory
+					{
+						CategoryId = c.CategoryId,
+						CategoryName = c.CategoryName,
+						Description = c.Description,
+						DisplayOrder = c.DisplayOrder,
+						IsActive = Convert.ToInt16(c.IsActive)
+					})
+					.FirstOrDefaultAsync() ?? new ProductCategory();
+
+			// If the category is not found, return an empty list of subcategories and total count as 0
+			if (category.CategoryId == 0)
+				return (category, Enumerable.Empty<ProductSubCategory>(), 0);
+
+			int actualPage = PageNumber ?? 1;
+			int actualSize = PageSize ?? 10;
+			if (actualPage < 1) actualPage = 1;
+			if (actualSize < 1) actualSize = 10;
+
+			int totalCount = await dbContext.Subcategories.CountAsync();
+
+			IEnumerable<ProductSubCategory>? pagedSubCategories = await dbContext.Subcategories
+				.AsNoTracking()
+				.OrderBy(c => c.CategoryId)
+				.Skip((actualPage - 1) * actualSize)
+				.Take(actualSize)
+				.Select(c => new ProductSubCategory
+				{
+					SubcategoryID = c.SubcategoryID,
+					SubcategoryName = c.SubcategoryName,
+					Description = c.Description,
+					DisplayOrder = c.DisplayOrder,
+					IsActive = Convert.ToInt16(c.IsActive)
+				})
+				.ToListAsync();
+
+			return (category, pagedSubCategories, totalCount);
 		}
 	}
 }

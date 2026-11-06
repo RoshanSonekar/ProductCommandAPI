@@ -28,7 +28,7 @@ public class SubCategoryController : ControllerBase
 		}
 		catch (DbUpdateException ex)
 		{
-			return StatusCode(StatusCodes.Status400BadRequest, new ResponseModel { Id = 0, IsSuccess = false, Message = ex.InnerException?.Message ?? ex.Message });
+			return StatusCode(StatusCodes.Status400BadRequest, new ResponseModel { Id = 0, IsSuccess = false, Message = "Category might not exist. >>" + ex.InnerException?.Message ?? ex.Message });
 		}
 		catch (System.ComponentModel.DataAnnotations.ValidationException ex)
 		{
