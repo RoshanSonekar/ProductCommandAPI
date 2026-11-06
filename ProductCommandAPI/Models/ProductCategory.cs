@@ -13,9 +13,11 @@ namespace ProductCommandAPI.Models
 		public int CategoryId { get; set; }
 
 		[Required]
-		public string CategoryName { get; set; } = default!;
+		public string CategoryName { get; set; } = default!; 
+		[Required]
 		public int DisplayOrder { get; set; } = 0;
 		public string? Description { get; set; }
 		public int IsActive { get; set; } = 1;
+		public DateTime UpdatedDate { get; set; } = DateTime.UtcNow;
 	}
 }

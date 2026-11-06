@@ -17,8 +17,11 @@ namespace ProductCommandAPI.Models
 
 		[Required]
 		public string SubcategoryName { get; set; } = default!;
+
+		[Required]
 		public int DisplayOrder { get; set; } = 0;
 		public string? Description { get; set; }
 		public int IsActive { get; set; } = 1;
+		public DateTime UpdatedDate { get; set; } = DateTime.UtcNow;
 	} 
 }

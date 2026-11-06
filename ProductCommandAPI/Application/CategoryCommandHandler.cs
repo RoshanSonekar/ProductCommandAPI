@@ -44,11 +44,10 @@ public class CategoryCommandHandler(ICategoryService categoryService)
 		await categoryService.UpsertCategory(category, cancellationToken);
 		return new CategoryResult(category.CategoryId, true);
 	}
-	}
+}
 public class CategoryUpdateCommandHandler(ICategoryService categoryService)
 	: ICommandHandler<CategoryUpdateCommand, CategoryResult>
 {
-
 	public async Task<CategoryResult> Handle(CategoryUpdateCommand command, CancellationToken cancellationToken)
 	{
 		var category = new ProductCategory

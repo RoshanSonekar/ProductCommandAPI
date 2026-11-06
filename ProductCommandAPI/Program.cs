@@ -27,24 +27,13 @@ builder.Services.AddMediatR(config =>
 // Add FluentValidation services
 builder.Services.AddValidatorsFromAssembly(assembly);
 
-//// Add Carter for minimal API
-//builder.Services.AddCarter();
-
-//builder.Services.AddMarten(options =>
-//{
-//	options.Connection(builder.Configuration.GetConnectionString("PostgreSql")!); // Roshan#2026@ DB password
-//}).UseLightweightSessions();
-
 builder.Services.AddDbContext<ProductCommandAPIContext>
 	(
 	options => options.UseSqlServer(connectionString
 	));
 
 builder.Services.AddExceptionHandler<CustomExceptionHandler>();
-
-//builder.Services.AddHealthChecks()
-//	.AddNpgSql(builder.Configuration.GetConnectionString("PostgreSql")!);
-
+ 
 // Application Services
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<IProductService, ProductService>();

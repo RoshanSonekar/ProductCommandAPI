@@ -1,12 +1,11 @@
-﻿
-CREATE TABLE Categories (
+﻿CREATE TABLE Categories (
     CategoryID INT IDENTITY(1,1) PRIMARY KEY,
     CategoryName VARCHAR(100) NOT NULL,
     DisplayOrder INT NOT NULL DEFAULT 0, 
     Description VARCHAR(500) NULL,  
     IsActive BIT NOT NULL DEFAULT 1,
-    CreatedDate DATETIME2 NOT NULL DEFAULT GETDATE(),
-
+    CreatedDate DATETIME2 NOT NULL DEFAULT GETDATE(),    
+    UpdatedDate DATETIME2 NULL,
     -- Unique Constraint on CategoryName
     CONSTRAINT UQ_Categories_CategoryName UNIQUE (CategoryName)
 );
@@ -19,6 +18,8 @@ CREATE TABLE Subcategories (
     DisplayOrder INT NOT NULL DEFAULT 0, 
     Description VARCHAR(500) NULL,
     IsActive BIT NOT NULL DEFAULT 1,
+    CreatedDate DATETIME2 NOT NULL DEFAULT GETDATE(),
+    UpdatedDate DATETIME2 NULL,
     
     CONSTRAINT FK_Subcategories_Categories FOREIGN KEY (CategoryID) 
         REFERENCES Categories(CategoryID) ON DELETE CASCADE,

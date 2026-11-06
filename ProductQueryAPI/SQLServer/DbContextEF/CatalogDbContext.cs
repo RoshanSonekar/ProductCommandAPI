@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace CatalogQueryService.SQLServer.DbContextEF
 {
-	public class CatalogDbContext
+	public class CatalogDbContext(DbContextOptions<CatalogDbContext> options) : DbContext(options)
 	{
 		public DbSet<ProductCategory> Categories { get; set; } = default!;
 		//public DbSet<ProductCommandAPI.Models.Product> Product { get; set; } = default!;

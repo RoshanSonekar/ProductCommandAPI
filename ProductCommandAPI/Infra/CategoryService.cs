@@ -1,6 +1,7 @@
 ﻿using ProductCommandAPI.Models;
 
 namespace ProductCommandAPI.Infra;
+
 public class CategoryService : ICategoryService
 {
 	private readonly ProductCommandAPIContext context;
@@ -8,11 +9,13 @@ public class CategoryService : ICategoryService
 	{
 		context = _context;
 	}
+
+	// insert/update category
 	public async Task<ResponseModel> UpsertCategory(ProductCategory category, CancellationToken cancellationToken)
 	{
 		try
 		{
-			if(category.CategoryId == 0)
+			if (category.CategoryId == 0)
 				context.Add(category);
 			else
 				context.Update(category);
@@ -21,21 +24,21 @@ public class CategoryService : ICategoryService
 
 			return new ResponseModel
 			{
-				Id = category.CategoryId,  
+				Id = category.CategoryId,
 				IsSuccess = true
 			};
 		}
-		catch (Exception ex)
+		catch (Microsoft.EntityFrameworkCore.DbUpdateException)
 		{
-			// For production APIs, consider logging 'ex' here instead of throwing or swallowing it entirely
-			return new ResponseModel
-			{
-				Id = 0,
-				IsSuccess = false
-			};
+			throw;
 		}
-	} 
+		catch
+		{
+			throw;
+		}
+	}
 
+	// insert/update sub-category
 	public async Task<ResponseModel> UpsertSubCategory(ProductSubCategory subCategory, CancellationToken cancellationToken)
 	{
 		try
@@ -53,14 +56,13 @@ public class CategoryService : ICategoryService
 				IsSuccess = true
 			};
 		}
-		catch (Exception ex)
+		catch (Microsoft.EntityFrameworkCore.DbUpdateException)
 		{
-			// For production APIs, consider logging 'ex' here instead of throwing or swallowing it entirely
-			return new ResponseModel
-			{	
-				Id = 0,
-				IsSuccess = false
-			};
+			throw;
+		}
+		catch
+		{
+			throw;
 		}
 	}
 }

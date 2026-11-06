@@ -1,5 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using ProductCommandAPI.Application;
 using ProductCommandAPI.Models;
 
@@ -14,48 +14,56 @@ public class SubCategoryController : ControllerBase
 	}
 
 	[HttpPost("V1/SubCategory")]
-	public async Task<ActionResult<ProductSubCategory>> CreateSubCategory([FromBody] SubCategoryCommand category)
+	public async Task<ActionResult<ProductSubCategory>> CreateSubCategory([FromBody] SubCategoryCommand subCategory)
 	{
 		try
 		{
-			var result = await _mediatR.Send(category);
-			return StatusCode(StatusCodes.Status201Created, result.SubCategoryId);
+			var result = await _mediatR.Send(subCategory);
+			return StatusCode(StatusCodes.Status201Created, new ResponseModel { Id = result.SubCategoryId, IsSuccess = result.IsSuccess, Message = "Sub-Category created successfully." });
 		}
-		catch (Microsoft.EntityFrameworkCore.DbUpdateException ex)
+		catch (DbUpdateException ex)
 				when (ex.InnerException?.Message.Contains("duplicate") == true)
 		{
-			return Conflict(new { message = "SubCategory already exists." });
+			return Conflict(new ResponseModel { Id = 0, IsSuccess = false, Message = "Sub-Category already exists." });
+		}
+		catch (DbUpdateException ex)
+		{
+			return StatusCode(StatusCodes.Status400BadRequest, new ResponseModel { Id = 0, IsSuccess = false, Message = ex.InnerException?.Message ?? ex.Message });
 		}
 		catch (System.ComponentModel.DataAnnotations.ValidationException ex)
 		{
-			return BadRequest(new { message = ex.Message });
+			return BadRequest(new ResponseModel { Id = 0, IsSuccess = false, Message = ex.Message });
 		}
-		catch (Exception ex)
+		catch
 		{
-			return StatusCode(StatusCodes.Status500InternalServerError, new { message = "An unexpected server error occurred." });
+			return StatusCode(StatusCodes.Status500InternalServerError, new ResponseModel { Id = 0, IsSuccess = false, Message = "An unexpected server error occurred." });
 		}
 	}
 
 	[HttpPut("V1/SubCategory")]
-	public async Task<ActionResult<ProductSubCategory>> UpdateSubCategory([FromBody] SubCategoryUpdateCommand category)
+	public async Task<ActionResult<ProductSubCategory>> UpdateSubCategory([FromBody] SubCategoryUpdateCommand subCategory)
 	{
 		try
 		{
-			var result = await _mediatR.Send(category);
-			return StatusCode(StatusCodes.Status201Created, result.SubCategoryId);
+			var result = await _mediatR.Send(subCategory);
+			return StatusCode(StatusCodes.Status201Created, new ResponseModel { Id = result.SubCategoryId, IsSuccess = result.IsSuccess, Message = "Sub-Category updated successfully." });
 		}
-		catch (Microsoft.EntityFrameworkCore.DbUpdateException ex)
+		catch (DbUpdateException ex)
 				when (ex.InnerException?.Message.Contains("duplicate") == true)
 		{
-			return Conflict(new { message = "SubCategory already exists." });
+			return Conflict(new ResponseModel { Id = 0, IsSuccess = false, Message = "Sub-Category already exists." });
+		}
+		catch (DbUpdateException ex)
+		{
+			return StatusCode(StatusCodes.Status400BadRequest, new ResponseModel { Id = 0, IsSuccess = false, Message = ex.InnerException?.Message ?? ex.Message });
 		}
 		catch (System.ComponentModel.DataAnnotations.ValidationException ex)
 		{
-			return BadRequest(new { message = ex.Message });
+			return BadRequest(new ResponseModel { Id = 0, IsSuccess = false, Message = ex.Message });
 		}
-		catch (Exception ex)
+		catch
 		{
-			return StatusCode(StatusCodes.Status500InternalServerError, new { message = "An unexpected server error occurred." });
+			return StatusCode(StatusCodes.Status500InternalServerError, new ResponseModel { Id = 0, IsSuccess = false, Message = "An unexpected server error occurred." });
 		}
 	}
 }
